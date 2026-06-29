@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	sectionStartRegex = regexp.MustCompile(`^<!-- section-start (.+) -->`)
-	sectionEndRegex   = regexp.MustCompile(`^<!-- section-end (.+) -->`)
+	sectionStartRegex = regexp.MustCompile(`^<!--\s*section-start (.+?)\s*-->`)
+	sectionEndRegex   = regexp.MustCompile(`^<!--\s*section-end (.+?)\s*-->`)
 )
 
 const (
