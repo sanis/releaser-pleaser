@@ -173,6 +173,32 @@ func Test_parseSinglePRBodyForCommitOverrides(t *testing.T) {
 			wantErr: assert.NoError,
 		},
 		{
+			name: "override entries are not treated as merge commits",
+			commit: git.Commit{
+				Hash:    "123",
+				Message: "Merge pull request #1 from foo/bar",
+				Parents: []string{"aaa", "bbb"},
+				PullRequest: &git.PullRequest{
+					ID:          1,
+					Title:       "Foo",
+					Description: "```rp-commits\nfeat: shiny\n```\n",
+				},
+			},
+			want: []git.Commit{
+				{
+					Hash:    "123",
+					Message: "feat: shiny",
+					Parents: nil,
+					PullRequest: &git.PullRequest{
+						ID:          1,
+						Title:       "Foo",
+						Description: "```rp-commits\nfeat: shiny\n```\n",
+					},
+				},
+			},
+			wantErr: assert.NoError,
+		},
+		{
 			name: "commit messages from override",
 			commit: git.Commit{
 				Hash:    "123",

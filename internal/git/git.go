@@ -6,6 +6,8 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -25,6 +27,10 @@ type Commit struct {
 	URL     string
 	Message string
 
+	// Parents holds the hashes of all parent commits, as reported by the forge. It is empty
+	// if the forge does not report them.
+	Parents []string
+
 	PullRequest *PullRequest
 }
 
@@ -33,6 +39,30 @@ func (c Commit) ShortHash() string {
 		return c.Hash
 	}
 	return c.Hash[:7]
+}
+
+// Subject returns the first line of the commit message, without surrounding whitespace.
+func (c Commit) Subject() string {
+	message := strings.TrimSpace(c.Message)
+	if idx := strings.IndexByte(message, '\n'); idx >= 0 {
+		message = message[:idx]
+	}
+
+	return strings.TrimSpace(message)
+}
+
+// mergeCommitSubjectRegex matches the merge commit subjects that git and the forges create by
+// default. It is only used as a fallback for commits where the forge did not report any parents.
+var mergeCommitSubjectRegex = regexp.MustCompile(`^Merge (branch|branches|tag|commit|pull request|remote-tracking branch) `)
+
+// IsMerge reports if the commit has more than one parent. If the forge did not report any
+// parents, we fall back to matching the default merge commit subjects.
+func (c Commit) IsMerge() bool {
+	if len(c.Parents) > 0 {
+		return len(c.Parents) > 1
+	}
+
+	return mergeCommitSubjectRegex.MatchString(c.Subject())
 }
 
 type PullRequest struct {

@@ -170,6 +170,7 @@ func (g *GitLab) CommitsSince(ctx context.Context, tag *git.Tag) ([]git.Commit, 
 			Hash:    ghCommit.ID,
 			URL:     g.CommitURL(ghCommit.ID),
 			Message: ghCommit.Message,
+			Parents: ghCommit.ParentIDs,
 		}
 		commit.PullRequest, err = g.prForCommit(ctx, commit)
 		if err != nil {

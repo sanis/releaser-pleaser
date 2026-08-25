@@ -50,6 +50,9 @@ func parseSinglePRBodyForCommitOverrides(commit git.Commit) ([]git.Commit, error
 
 		newCommit := commit
 		newCommit.Message = line
+		// The overrides are changelog entries written by hand, they are not the merge commit
+		// they were read from. Dropping the parents keeps them out of the merge commit filter.
+		newCommit.Parents = nil
 		result = append(result, newCommit)
 	}
 

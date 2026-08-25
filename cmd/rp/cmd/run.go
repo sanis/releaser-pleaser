@@ -21,12 +21,13 @@ import (
 
 func newRunCommand() *cobra.Command {
 	var (
-		flagForge      string
-		flagBranch     string
-		flagOwner      string
-		flagRepo       string
-		flagExtraFiles string
-		flagUpdaters   []string
+		flagForge         string
+		flagBranch        string
+		flagOwner         string
+		flagRepo          string
+		flagExtraFiles    string
+		flagUpdaters      []string
+		flagVersionPrefix string
 
 		flagAPIURL   string
 		flagAPIToken string
@@ -92,6 +93,11 @@ func newRunCommand() *cobra.Command {
 				return fmt.Errorf("unknown --forge: %s", flagForge)
 			}
 
+			versionPrefix, err := versioning.ParseVersionPrefix(flagVersionPrefix)
+			if err != nil {
+				return fmt.Errorf("invalid --version-prefix: %w", err)
+			}
+
 			extraFiles := parseExtraFiles(flagExtraFiles)
 
 			updaterNames := parseUpdaters(flagUpdaters)
@@ -114,7 +120,7 @@ func newRunCommand() *cobra.Command {
 				logger,
 				flagBranch,
 				conventionalcommits.NewParser(logger),
-				versioning.SemVer,
+				versioning.SemVer(versionPrefix),
 				extraFiles,
 				updaters,
 			)
@@ -129,6 +135,7 @@ func newRunCommand() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&flagRepo, "repo", "", "")
 	cmd.PersistentFlags().StringVar(&flagExtraFiles, "extra-files", "", "")
 	cmd.PersistentFlags().StringSliceVar(&flagUpdaters, "updaters", []string{}, "")
+	cmd.PersistentFlags().StringVar(&flagVersionPrefix, "version-prefix", "", "")
 
 	cmd.PersistentFlags().StringVar(&flagAPIURL, "api-url", "", "")
 	cmd.PersistentFlags().StringVar(&flagAPIToken, "api-token", "", "")
