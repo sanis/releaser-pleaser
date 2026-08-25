@@ -4,7 +4,7 @@ Changelog
   : The Changelog is a file in the repository (`CHANGELOG.md`) that contains the [Release Notes](#release-notes) for every release of that repository. Usually, new releases are added at the top of the file.
 
 Conventional Commits
-  : [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) is a specification for commit messages. It is the only supported commit message schema in `releaser-pleaser`. Follow the link to learn more.
+  : [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) is a specification for commit messages. It is the commit message schema `releaser-pleaser` understands, and the only way to ask for a `minor` or `major` version bump. Commits that do not follow the specification are still released, they show up in the Release Notes under "Other Changes" and cause a `patch` bump. Follow the link to learn more.
 
 Forge
   : A **forge** is a web-based collaborative software platform for both developing and sharing computer applications.[^wp-forge]

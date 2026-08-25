@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/apricote/releaser-pleaser/internal/git"
 	"github.com/apricote/releaser-pleaser/internal/testdata"
@@ -140,12 +141,27 @@ func TestReleasePullRequest_SetTitle(t *testing.T) {
 			},
 			want: "chore(release-1.x): release v1.1.1-rc.0",
 		},
+		{
+			name: "version without the v prefix",
+			pr:   &ReleasePullRequest{},
+			args: args{
+				branch:  "main",
+				version: "1.396.0",
+			},
+			want: "chore(main): release 1.396.0",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.pr.SetTitle(tt.args.branch, tt.args.version)
 
 			assert.Equal(t, tt.want, tt.pr.Title)
+
+			// The version we put into the title is the version we read back out for the tag and
+			// the release title, with or without the prefix.
+			version, err := tt.pr.Version()
+			require.NoError(t, err)
+			assert.Equal(t, tt.args.version, version)
 		})
 	}
 }

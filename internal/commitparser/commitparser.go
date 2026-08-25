@@ -4,6 +4,16 @@ import (
 	"github.com/apricote/releaser-pleaser/internal/git"
 )
 
+const (
+	TypeFeature = "feat"
+	TypeFix     = "fix"
+
+	// TypeOther is the type reported for commits that are not conventional commits. It has no
+	// meaning to the conventional commits spec, we use it so that these commits still show up in
+	// the changelog instead of being dropped.
+	TypeOther = "other"
+)
+
 type CommitParser interface {
 	Analyze(commits []git.Commit) ([]AnalyzedCommit, error)
 }
