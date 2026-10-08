@@ -13,7 +13,7 @@ spec:
       default: ""
 
     updaters:
-      description: "List of updaters that are run. Default updaters can be removed by specifying them as -name. Multiple updaters should be concatenated with a comma. Default Updaters: changelog,generic"
+      description: "List of updaters that are run. Default updaters can be removed by specifying them as -name. Multiple updaters should be concatenated with a comma. Default Updaters: changelog,generic (none if prerelease-id is set)"
       default: ""
 
     prerelease-id:

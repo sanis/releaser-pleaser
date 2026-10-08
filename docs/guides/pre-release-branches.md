@@ -26,7 +26,6 @@ include:
       branch: staging
       prerelease-id: staging
       job-name: releaser-pleaser-staging
-      updaters: -changelog,-generic
 ```
 
 ### GitHub Actions
@@ -63,14 +62,15 @@ jobs:
         with:
           branch: ${{ github.ref_name }}
           prerelease-id: ${{ github.ref_name == 'staging' && 'staging' || '' }}
-          updaters: ${{ github.ref_name == 'staging' && '-changelog,-generic' || '' }}
 ```
 
 For `pull_request_target` events, `github.ref_name` is the base branch of the pull request.
 
 ## Files in the release pull request
 
-If you merge `main` into `staging` regularly, do not let the release pull request for `staging` change files. Otherwise `CHANGELOG.md` and the version references conflict on each merge. Disable the default updaters with `updaters: -changelog,-generic`. The release pull request then contains one commit without file changes, and the release notes are only in the pull request description and the release on the forge.
+If you merge `main` into `staging` regularly, the release pull request for `staging` must not change files. Otherwise `CHANGELOG.md` and the version references conflict on each merge. For this reason, runs with `prerelease-id` do not run any [updaters](../reference/updaters.md) by default. The release pull request contains one commit without file changes, and the release notes are only in the pull request description and the release on the forge.
+
+To change files on the pre-release branch anyway, enable the updaters explicitly, for example `updaters: changelog,generic`.
 
 ## Versioning
 

@@ -36,9 +36,10 @@ func (s semVer) NextVersion(r git.Releases, versionBump VersionBump, nextVersion
 	}
 
 	// If there is a previous stable release, we use that as the version anchor. Falling back to any pre-releases
-	// if they are the only tags in the repo.
+	// if they are the only tags in the repo. With a prereleaseID, the latest release is always one of our own
+	// pre-releases, so we anchor on the stable release (or v0.0.0) and count up the pre-release instead.
 	next := latest
-	if r.Stable != nil {
+	if r.Stable != nil || s.prereleaseID != "" {
 		next = stable
 	}
 

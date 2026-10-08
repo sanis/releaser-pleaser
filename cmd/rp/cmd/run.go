@@ -108,7 +108,7 @@ func newRunCommand() *cobra.Command {
 
 			extraFiles := parseExtraFiles(flagExtraFiles)
 
-			updaterNames := parseUpdaters(flagUpdaters)
+			updaterNames := parseUpdaters(flagUpdaters, flagPrereleaseID)
 			updaters := []updater.Updater{}
 			for _, name := range updaterNames {
 				switch name {
@@ -143,7 +143,7 @@ func newRunCommand() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&flagRepo, "repo", "", "")
 	cmd.PersistentFlags().StringVar(&flagExtraFiles, "extra-files", "", "")
 	cmd.PersistentFlags().StringSliceVar(&flagUpdaters, "updaters", []string{}, "")
-	cmd.PersistentFlags().StringVar(&flagPrereleaseID, "prerelease-id", "", "Release every version on --branch as a pre-release with this identifier, e.g. staging -> v1.2.0-staging.0")
+	cmd.PersistentFlags().StringVar(&flagPrereleaseID, "prerelease-id", "", "Release every version on --branch as a pre-release with this identifier, e.g. staging -> v1.2.0-staging.0. Disables the default updaters.")
 
 	cmd.PersistentFlags().StringVar(&flagAPIURL, "api-url", "", "")
 	cmd.PersistentFlags().StringVar(&flagAPIToken, "api-token", "", "")
@@ -172,8 +172,14 @@ func parseExtraFiles(input string) []string {
 	return extraFiles
 }
 
-func parseUpdaters(input []string) []string {
+// parseUpdaters returns the names of the updaters to run. Pre-release branches (prereleaseID set) do not run any
+// updaters by default, so their release pull requests do not change files that conflict with merges from the
+// stable branch.
+func parseUpdaters(input []string, prereleaseID string) []string {
 	names := []string{"changelog", "generic"}
+	if prereleaseID != "" {
+		names = []string{}
+	}
 
 	for _, u := range input {
 		if u == "" {

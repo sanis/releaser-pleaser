@@ -480,8 +480,8 @@ func TestSemVerWithPrereleaseID_NextVersion(t *testing.T) {
 			releases: git.Releases{
 				Latest: &git.Tag{Name: "v0.1.0-staging.0"},
 			},
-			versionBump: PatchVersion,
-			want:        "v0.1.1-staging.0",
+			versionBump: MinorVersion,
+			want:        "v0.1.0-staging.1",
 			wantErr:     assert.NoError,
 		},
 		{
