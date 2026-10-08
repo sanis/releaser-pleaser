@@ -1,0 +1,78 @@
+internal/markdown/extensions/section.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 18-19
+docs/reference/glossary.md
+  s_01cd1638d88c65::t_b85c50b0f9e876 7
+internal/versioning/semver.go
+  s_01cd1638d88c65::t_75c000c137a2c9 21-24,28,76
+  s_01cd1638d88c65::t_b85c50b0f9e876 15-18,89,108-138,143,147
+docs/reference/gitlab-cicd-component.md
+  s_01cd1638d88c65::t_b85c50b0f9e876 28
+internal/versioning/versioning.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 4-6,17-59
+  s_01cd1638d88c65::t_26423c88da5373 60
+internal/versioning/versioning_test.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 1-84
+releaserpleaser_test.go
+  s_01cd1638d88c65::t_316ad25100aad4 58
+internal/forge/forgejo/forgejo.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 153-157,162
+templates/run.yml
+  s_01cd1638d88c65::t_b85c50b0f9e876 27-30,71
+  s_01cd1638d88c65::t_75c000c137a2c9 70
+internal/changelog/changelog.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 8-9,44-124
+  s_01cd1638d88c65::t_4be8f2315c1d1d 125
+docs/reference/github-action.md
+  s_01cd1638d88c65::t_b85c50b0f9e876 27
+prbody.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 53-55
+internal/forge/gitlab/gitlab.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 183
+internal/commitparser/conventionalcommits/conventionalcommits_test.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 27,33-58,67,70-77,80,86-180,193-197
+action.yml
+  s_01cd1638d88c65::t_b85c50b0f9e876 28-31,60
+cmd/rp/cmd/run.go
+  s_01cd1638d88c65::t_75c000c137a2c9 60-65,67
+  s_01cd1638d88c65::t_b85c50b0f9e876 24-30,152
+internal/changelog/changelog.md.tpl
+  s_01cd1638d88c65::t_b85c50b0f9e876 14-15,17
+internal/releasepr/releasepr_test.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 7,144-152,159-164
+internal/versioning/semver_test.go
+  s_01cd1638d88c65::t_c1d5ce8408944b 573,637-669,673
+  s_01cd1638d88c65::t_b85c50b0f9e876 20,315-440,458,479,481-496,565
+internal/changelog/changelog_test.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 133-270
+internal/git/git.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 9-10,30-33,44-66
+  s_01cd1638d88c65::t_2a16ff188b760f 67
+internal/commitparser/conventionalcommits/conventionalcommits.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 6,16-19,37-39,42,45-47,50,52-54,57,59-61,64,69-122
+prbody_test.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 176-200
+  s_01cd1638d88c65::t_9bddb9dbb32c58 175
+internal/commitparser/commitparser.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 7-16
+internal/forge/github/github.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 166-170,175
+internal/git/git_test.go
+  s_01cd1638d88c65::t_b85c50b0f9e876 258-354
+  s_01cd1638d88c65::t_75c000c137a2c9 257
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "095354d902309a9df39a1c4af9a1c831c8f7e1ec",
+  "prompts": {},
+  "sessions": {
+    "s_01cd1638d88c65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6df3d3ba-eb3a-4b7c-aba9-1c1d06b0de7a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Justinas Bolys <justinas.bolys@mediatech.one>"
+    }
+  }
+}
