@@ -1,0 +1,38 @@
+internal/versioning/semver.go
+  s_d937d3c5243e74::t_96226fbe2ca98f 5-6,17-25,59-67,72-74,81-96,143-186
+  s_d937d3c5243e74::t_a828a2ee620ecd 187
+internal/versioning/semver_test.go
+  s_d937d3c5243e74::t_d83ed7010e6f38 7,9,427-534
+internal/forge/forge.go
+  s_d937d3c5243e74::t_4e023efb4f3f88 71
+  s_d937d3c5243e74::t_275ed3ad80a849 70,72
+internal/forge/forgejo/forgejo.go
+  s_d937d3c5243e74::t_275ed3ad80a849 19,115-119
+  s_d937d3c5243e74::t_4f8acc18b9f648 120-123
+cmd/rp/cmd/run.go
+  s_d937d3c5243e74::t_d6e9cc5c89924f 31-32,51,54-63,67-69,131,146
+internal/forge/gitlab/gitlab.go
+  s_d937d3c5243e74::t_275ed3ad80a849 20,128-132
+  s_d937d3c5243e74::t_8a3fd1eb09d859 133-136
+internal/forge/github/github.go
+  s_d937d3c5243e74::t_275ed3ad80a849 21,128-132
+  s_d937d3c5243e74::t_049fbd35f6dd05 133-136
+releaserpleaser.go
+  s_d937d3c5243e74::t_0c91c104dc2edc 254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "efda6f4d639f936b42a89a6aad1b5761259b557e",
+  "prompts": {},
+  "sessions": {
+    "s_d937d3c5243e74": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bad33d52-2205-4e45-90ff-3a7fcb23bc90",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Justinas Bolys <justinas.bolys@mediatech.one>"
+    }
+  }
+}
