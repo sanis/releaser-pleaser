@@ -150,10 +150,16 @@ func (f *Forgejo) CommitsSince(ctx context.Context, tag *git.Tag) ([]git.Commit,
 
 	var commits = make([]git.Commit, 0, len(repositoryCommits))
 	for _, fCommit := range repositoryCommits {
+		parents := make([]string, 0, len(fCommit.Parents))
+		for _, parent := range fCommit.Parents {
+			parents = append(parents, parent.SHA)
+		}
+
 		commit := git.Commit{
 			Hash:    fCommit.SHA,
 			URL:     f.CommitURL(fCommit.SHA),
 			Message: fCommit.RepoCommit.Message,
+			Parents: parents,
 		}
 		commit.PullRequest, err = f.prForCommit(ctx, commit)
 		if err != nil {

@@ -11,15 +11,10 @@
 {{- if .Data.Prefix }}
 {{ .Data.Prefix }}
 {{ end -}}
-{{- with .Data.Commits.feat }}
-### Features
+{{- range .Data.Sections }}
+### {{ .Title }}
 
-{{ range . -}}{{template "entry" .}}{{end}}
-{{- end -}}
-{{- with .Data.Commits.fix }}
-### Bug Fixes
-
-{{ range . -}}{{template "entry" .}}{{end}}
+{{ range .Commits -}}{{template "entry" .}}{{end}}
 {{- end -}}
 
 {{- if .Data.Suffix }}

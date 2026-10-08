@@ -21,12 +21,13 @@ import (
 
 func newRunCommand() *cobra.Command {
 	var (
-		flagForge      string
-		flagBranch     string
-		flagOwner      string
-		flagRepo       string
-		flagExtraFiles string
-		flagUpdaters   []string
+		flagForge         string
+		flagBranch        string
+		flagOwner         string
+		flagRepo          string
+		flagExtraFiles    string
+		flagUpdaters      []string
+		flagVersionPrefix string
 
 		flagPrereleaseID string
 
@@ -56,9 +57,14 @@ func newRunCommand() *cobra.Command {
 				return err
 			}
 
-			versioningStrategy := versioning.SemVer
+			versionPrefix, err := versioning.ParseVersionPrefix(flagVersionPrefix)
+			if err != nil {
+				return fmt.Errorf("invalid --version-prefix: %w", err)
+			}
+
+			versioningStrategy := versioning.SemVer(versionPrefix)
 			if flagPrereleaseID != "" {
-				versioningStrategy = versioning.SemVerWithPrereleaseID(flagPrereleaseID)
+				versioningStrategy = versioning.SemVerWithPrereleaseID(flagPrereleaseID, versionPrefix)
 			}
 
 			var f forge.Forge
@@ -143,6 +149,7 @@ func newRunCommand() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&flagRepo, "repo", "", "")
 	cmd.PersistentFlags().StringVar(&flagExtraFiles, "extra-files", "", "")
 	cmd.PersistentFlags().StringSliceVar(&flagUpdaters, "updaters", []string{}, "")
+	cmd.PersistentFlags().StringVar(&flagVersionPrefix, "version-prefix", "", "")
 	cmd.PersistentFlags().StringVar(&flagPrereleaseID, "prerelease-id", "", "Release every version on --branch as a pre-release with this identifier, e.g. staging -> v1.2.0-staging.0. Disables the default updaters.")
 
 	cmd.PersistentFlags().StringVar(&flagAPIURL, "api-url", "", "")

@@ -24,6 +24,10 @@ spec:
       default: releaser-pleaser
       description: "Name of the created job. Set a different name when you include the component more than once, e.g. for a second branch."
 
+    version-prefix:
+      description: "Whether the released version carries a 'v' prefix. One of auto, v, none. auto reads the prefix from the existing tags and falls back to 'v'."
+      default: ""
+
     stage:
       default: build
       description: 'Defines the build stage'
@@ -63,4 +67,5 @@ $[[ inputs.job-name ]]:
         --branch=$[[ inputs.branch ]] \
         --extra-files="$[[ inputs.extra-files ]]" \
         --updaters="$[[ inputs.updaters ]]" \
-        --prerelease-id="$[[ inputs.prerelease-id ]]"
+        --prerelease-id="$[[ inputs.prerelease-id ]]" \
+        --version-prefix="$[[ inputs.version-prefix ]]"
