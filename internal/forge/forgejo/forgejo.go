@@ -430,6 +430,11 @@ func (f *Forgejo) PendingReleases(_ context.Context, pendingLabel releasepr.Labe
 			continue
 		}
 
+		if pr.Base == nil || pr.Base.Ref != f.options.BaseBranch {
+			// Release pull request for a different branch
+			continue
+		}
+
 		// pr.Merged is always nil :(
 		if !pr.HasMerged {
 			// Closed and not merged
