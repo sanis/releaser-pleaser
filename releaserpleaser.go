@@ -32,7 +32,7 @@ var (
 // releaseCommitSubjectRegex matches the subject of the release commits that releaser-pleaser creates, see
 // [releasepr.TitleFormat]. These are not changes of their own and must not trigger another release, e.g. when the
 // release commit of main is merged into a pre-release branch.
-var releaseCommitSubjectRegex = regexp.MustCompile(`^chore\([^)]+\): release v?\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$`)
+var releaseCommitSubjectRegex = regexp.MustCompile(`^chore\([^)]+\): release v?\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?( \(#\d+\))?$`)
 
 type ReleaserPleaser struct {
 	forge        forge.Forge
