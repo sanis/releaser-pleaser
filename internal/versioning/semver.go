@@ -2,6 +2,8 @@ package versioning
 
 import (
 	"fmt"
+	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/blang/semver/v4"
@@ -12,7 +14,15 @@ import (
 
 var SemVer Strategy = semVer{}
 
-type semVer struct{}
+// SemVerWithPrereleaseID returns a [Strategy] that always creates pre-releases with the given identifier,
+// e.g. v1.2.0-staging.0. The next version type from the release pull request is ignored.
+func SemVerWithPrereleaseID(id string) Strategy {
+	return semVer{prereleaseID: id}
+}
+
+type semVer struct {
+	prereleaseID string
+}
 
 func (s semVer) NextVersion(r git.Releases, versionBump VersionBump, nextVersionType NextVersionType) (string, error) {
 	latest, err := parseSemverWithDefault(r.Latest)
@@ -46,23 +56,47 @@ func (s semVer) NextVersion(r git.Releases, versionBump VersionBump, nextVersion
 		return "", err
 	}
 
+	if s.prereleaseID != "" {
+		// Count up only from pre-releases of the same version, so the counter starts at 0 for each new version.
+		if latest.Major != next.Major || latest.Minor != next.Minor || latest.Patch != next.Patch {
+			latest.Pre = nil
+		}
+
+		err = setNextPRVersion(&next, latest, s.prereleaseID)
+		if err != nil {
+			return "", err
+		}
+
+		return "v" + next.String(), nil
+	}
+
 	switch nextVersionType {
 	case NextVersionTypeUndefined, NextVersionTypeNormal:
 		next.Pre = make([]semver.PRVersion, 0)
 	case NextVersionTypeAlpha, NextVersionTypeBeta, NextVersionTypeRC:
-		id := uint64(0)
-
-		if len(latest.Pre) >= 2 && latest.Pre[0].String() == nextVersionType.String() {
-			if latest.Pre[1].String() == "" || !latest.Pre[1].IsNumeric() {
-				return "", fmt.Errorf("invalid format of previous tag")
-			}
-			id = latest.Pre[1].VersionNum + 1
+		err = setNextPRVersion(&next, latest, nextVersionType.String())
+		if err != nil {
+			return "", err
 		}
-
-		setPRVersion(&next, nextVersionType.String(), id)
 	}
 
 	return "v" + next.String(), nil
+}
+
+// setNextPRVersion sets the pre-release of version to prType, counting up from the latest release if it is a
+// pre-release of the same type.
+func setNextPRVersion(version *semver.Version, latest semver.Version, prType string) error {
+	id := uint64(0)
+
+	if len(latest.Pre) >= 2 && latest.Pre[0].String() == prType {
+		if latest.Pre[1].String() == "" || !latest.Pre[1].IsNumeric() {
+			return fmt.Errorf("invalid format of previous tag")
+		}
+		id = latest.Pre[1].VersionNum + 1
+	}
+
+	setPRVersion(version, prType, id)
+	return nil
 }
 
 func BumpFromCommits(commits []commitparser.AnalyzedCommit) VersionBump {
@@ -109,6 +143,51 @@ func parseSemverWithDefault(tag *git.Tag) (semver.Version, error) {
 	}
 
 	return parsedVersion, nil
+}
+
+var prereleaseIDPattern = regexp.MustCompile(`^[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*$`)
+
+// labelPrereleaseIDs are the pre-release identifiers that can be selected through the release pull request labels.
+var labelPrereleaseIDs = []string{
+	NextVersionTypeAlpha.String(),
+	NextVersionTypeBeta.String(),
+	NextVersionTypeRC.String(),
+}
+
+// ValidatePrereleaseID returns an error if id can not be used as the identifier for [SemVerWithPrereleaseID].
+// An empty id is valid and disables the custom pre-release identifier.
+func ValidatePrereleaseID(id string) error {
+	if id == "" {
+		return nil
+	}
+
+	if !prereleaseIDPattern.MatchString(id) {
+		return fmt.Errorf("invalid pre-release identifier %q: must only contain alphanumerics and hyphens, and must not be numeric", id)
+	}
+
+	if slices.Contains(labelPrereleaseIDs, id) {
+		return fmt.Errorf("invalid pre-release identifier %q: reserved for the release pull request labels", id)
+	}
+
+	return nil
+}
+
+// IncludesTag reports whether a release with the given version belongs to the releases that are considered when
+// calculating the next version for the pre-release identifier prereleaseID.
+//
+// Stable releases are always included. Without a prereleaseID only pre-releases created through the release pull
+// request labels (alpha, beta, rc) are included, otherwise only pre-releases with the same identifier.
+func IncludesTag(version semver.Version, prereleaseID string) bool {
+	if len(version.Pre) == 0 {
+		return true
+	}
+
+	id := version.Pre[0].String()
+	if prereleaseID == "" {
+		return slices.Contains(labelPrereleaseIDs, id)
+	}
+
+	return id == prereleaseID
 }
 
 func (s semVer) IsPrerelease(version string) bool {

@@ -16,6 +16,7 @@ import (
 	"github.com/apricote/releaser-pleaser/internal/git"
 	"github.com/apricote/releaser-pleaser/internal/pointer"
 	"github.com/apricote/releaser-pleaser/internal/releasepr"
+	"github.com/apricote/releaser-pleaser/internal/versioning"
 )
 
 const ()
@@ -107,6 +108,15 @@ func (f *Forgejo) LatestTags(ctx context.Context) (git.Releases, error) {
 				"tag.name", tag.Name,
 				"tag.hash", tag.Hash,
 				"error", err,
+			)
+			continue
+		}
+
+		if !versioning.IncludesTag(version, f.options.PrereleaseID) {
+			f.log.DebugContext(
+				ctx, "tag belongs to a different pre-release identifier, skipping",
+				"tag.name", tag.Name,
+				"tag.hash", tag.Hash,
 			)
 			continue
 		}

@@ -251,7 +251,7 @@ func (rp *ReleaserPleaser) runReconcileReleasePR(ctx context.Context) error {
 
 	changelogBaseTag := releases.Stable
 	analyzedCommitsForChangelog := analyzedCommitsForVersioning
-	if releaseOverrides.NextVersionType.IsPrerelease() && releases.Latest != releases.Stable {
+	if rp.versioning.IsPrerelease(nextVersion) && releases.Latest != releases.Stable {
 		changelogBaseTag = releases.Latest
 		analyzedCommitsForChangelog, err = rp.analyzedCommitsSince(ctx, releases.Latest)
 		if err != nil {

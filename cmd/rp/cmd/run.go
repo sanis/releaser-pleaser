@@ -28,6 +28,8 @@ func newRunCommand() *cobra.Command {
 		flagExtraFiles string
 		flagUpdaters   []string
 
+		flagPrereleaseID string
+
 		flagAPIURL   string
 		flagAPIToken string
 		flagUsername string
@@ -46,13 +48,25 @@ func newRunCommand() *cobra.Command {
 				"branch", flagBranch,
 				"owner", flagOwner,
 				"repo", flagRepo,
+				"prerelease-id", flagPrereleaseID,
 			)
+
+			err = versioning.ValidatePrereleaseID(flagPrereleaseID)
+			if err != nil {
+				return err
+			}
+
+			versioningStrategy := versioning.SemVer
+			if flagPrereleaseID != "" {
+				versioningStrategy = versioning.SemVerWithPrereleaseID(flagPrereleaseID)
+			}
 
 			var f forge.Forge
 
 			forgeOptions := forge.Options{
-				Repository: flagRepo,
-				BaseBranch: flagBranch,
+				Repository:   flagRepo,
+				BaseBranch:   flagBranch,
+				PrereleaseID: flagPrereleaseID,
 			}
 
 			switch flagForge {
@@ -114,7 +128,7 @@ func newRunCommand() *cobra.Command {
 				logger,
 				flagBranch,
 				conventionalcommits.NewParser(logger),
-				versioning.SemVer,
+				versioningStrategy,
 				extraFiles,
 				updaters,
 			)
@@ -129,6 +143,7 @@ func newRunCommand() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&flagRepo, "repo", "", "")
 	cmd.PersistentFlags().StringVar(&flagExtraFiles, "extra-files", "", "")
 	cmd.PersistentFlags().StringSliceVar(&flagUpdaters, "updaters", []string{}, "")
+	cmd.PersistentFlags().StringVar(&flagPrereleaseID, "prerelease-id", "", "Release every version on --branch as a pre-release with this identifier, e.g. staging -> v1.2.0-staging.0")
 
 	cmd.PersistentFlags().StringVar(&flagAPIURL, "api-url", "", "")
 	cmd.PersistentFlags().StringVar(&flagAPIToken, "api-token", "", "")

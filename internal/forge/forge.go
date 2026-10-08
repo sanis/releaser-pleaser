@@ -67,4 +67,7 @@ type Forge interface {
 type Options struct {
 	Repository string
 	BaseBranch string
+
+	// PrereleaseID limits the pre-release tags returned from [Forge.LatestTags], see versioning.IncludesTag.
+	PrereleaseID string
 }
