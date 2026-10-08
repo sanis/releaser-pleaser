@@ -72,11 +72,14 @@ If you merge `main` into `staging` regularly, the release pull request for `stag
 
 To change files on the pre-release branch anyway, enable the updaters explicitly, for example `updaters: changelog,generic`.
 
+Forgejo and Gitea cannot squash-merge a pull request without file changes. On these forges, merge the release pull request of the pre-release branch with a merge commit instead.
+
 ## Versioning
 
 - The version is calculated from the commits since the **last stable release**, the same as for the [pre-release labels](pre-releases.md#versioning).
 - The counter at the end increases for each release on the pre-release branch: `v1.3.0-staging.0`, then `v1.3.0-staging.1`. When the calculated version changes, for example to `v1.4.0`, the counter starts again at `0`.
 - The release notes contain the changes since the latest stable release or pre-release of the branch.
+- When there are no changes since the latest pre-release of the branch, no release pull request is opened, and an open one is closed.
 - Runs without `prerelease-id` ignore all tags with a custom identifier. Releases of `main` are therefore not affected by releases of `staging`: `main` still proposes `v1.3.0` after `v1.3.0-staging.2` was released, and its release notes contain all changes since the last stable release.
 - Tags created through the `rp-next-version::alpha`, `rp-next-version::beta` and `rp-next-version::rc` labels are not affected by this.
 

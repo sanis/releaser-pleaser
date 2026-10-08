@@ -227,18 +227,18 @@ func (rp *ReleaserPleaser) runReconcileReleasePR(ctx context.Context) error {
 		return err
 	}
 
-	if len(analyzedCommitsForVersioning) == 0 {
+	closeOrSkip := func() error {
 		if pr != nil {
 			logger.InfoContext(ctx, "closing existing pull requests, no commits available", "pr.id", pr.ID, "pr.title", pr.Title)
-			err = rp.forge.ClosePullRequest(ctx, pr)
-			if err != nil {
-				return err
-			}
-		} else {
-			logger.InfoContext(ctx, "No commits available for release")
+			return rp.forge.ClosePullRequest(ctx, pr)
 		}
 
+		logger.InfoContext(ctx, "No commits available for release")
 		return nil
+	}
+
+	if len(analyzedCommitsForVersioning) == 0 {
+		return closeOrSkip()
 	}
 
 	versionBump := versioning.BumpFromCommits(analyzedCommitsForVersioning)
@@ -256,6 +256,11 @@ func (rp *ReleaserPleaser) runReconcileReleasePR(ctx context.Context) error {
 		analyzedCommitsForChangelog, err = rp.analyzedCommitsSince(ctx, releases.Latest)
 		if err != nil {
 			return err
+		}
+
+		// Nothing changed since the latest pre-release, so a new pre-release would be empty.
+		if len(analyzedCommitsForChangelog) == 0 {
+			return closeOrSkip()
 		}
 	}
 
