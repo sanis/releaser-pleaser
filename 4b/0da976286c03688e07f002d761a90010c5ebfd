@@ -1,0 +1,19 @@
+docs/guides/pre-release-branches.md
+  s_822c56740044c3::t_4660f4030238de 82-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4b0da976286c03688e07f002d761a90010c5ebfd",
+  "prompts": {},
+  "sessions": {
+    "s_822c56740044c3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ca34708-96dc-4403-bce1-0b12db798e70",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Justinas Bolys <justinas.bolys@mediatech.one>"
+    }
+  }
+}
