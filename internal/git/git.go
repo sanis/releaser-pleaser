@@ -180,6 +180,8 @@ func (r *Repository) Commit(_ context.Context, message string, author Author) (C
 	releaseCommitHash, err := worktree.Commit(message, &git.CommitOptions{
 		Author:    author.signature(now),
 		Committer: author.signature(now),
+		// The release commit may not change any files, e.g. if all updaters are disabled.
+		AllowEmptyCommits: true,
 	})
 	if err != nil {
 		return Commit{}, fmt.Errorf("failed to commit changes: %w", err)
@@ -244,6 +246,12 @@ func (r *Repository) hasChangesWithRemote(ctx context.Context, mainBranchRef, lo
 	localDiff, err := commitOnRemoteMain.PatchContext(ctx, commitOnLocalPRBranch)
 	if err != nil {
 		return false, err
+	}
+
+	if commitOnRemotePRBranch.Message != commitOnLocalPRBranch.Message {
+		// The release commit message contains the version. It can change without any file changes, e.g. when all
+		// updaters are disabled.
+		return true, nil
 	}
 
 	return remoteDiff.String() != localDiff.String(), nil

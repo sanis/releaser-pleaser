@@ -32,6 +32,10 @@ Changing the pre-release type (for example from `beta` to `rc`), resets the coun
 
 `releaser-pleaser` ignores pre-releases when looking for releasable commits. This means that right after creating a new pre-release, `releaser-pleaser` again detects releasable commits and opens a new release pull request for the stable version.
 
+## Pre-release branches
+
+To release a whole branch (for example `staging`) as pre-releases, see [Pre-release branches](pre-release-branches.md).
+
 ## Related Documentation
 
 - **Reference**

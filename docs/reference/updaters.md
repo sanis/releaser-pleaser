@@ -9,6 +9,8 @@ They each have a name and may be enabled by default. You can configure which upd
 updaters: -generic,packagejson
 ```
 
+Runs with `prerelease-id` set do not enable any updaters by default, see [Pre-release branches](../guides/pre-release-branches.md#files-in-the-release-pull-request).
+
 ## Changelog
 
 - **Name**: `changelog`

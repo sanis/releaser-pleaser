@@ -60,9 +60,10 @@ dir/Chart.yaml"`,
 
 func Test_parseUpdaters(t *testing.T) {
 	tests := []struct {
-		name  string
-		input []string
-		want  []string
+		name         string
+		input        []string
+		prereleaseID string
+		want         []string
 	}{
 		{
 			name:  "empty",
@@ -94,10 +95,22 @@ func Test_parseUpdaters(t *testing.T) {
 			input: []string{""},
 			want:  []string{"changelog", "generic"},
 		},
+		{
+			name:         "prerelease id disables defaults",
+			input:        []string{""},
+			prereleaseID: "staging",
+			want:         []string{},
+		},
+		{
+			name:         "prerelease id honours explicit updaters",
+			input:        []string{"changelog", "generic"},
+			prereleaseID: "staging",
+			want:         []string{"changelog", "generic"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := parseUpdaters(tt.input)
+			got := parseUpdaters(tt.input, tt.prereleaseID)
 			assert.Equal(t, tt.want, got)
 		})
 	}

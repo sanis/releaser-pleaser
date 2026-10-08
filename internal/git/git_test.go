@@ -161,6 +161,53 @@ func TestRepository_HasChangesWithRemote(t *testing.T) {
 			want:    true,
 			wantErr: assert.NoError,
 		},
+		{
+			name: "same files but different release commit message",
+			repo: WithTestRepo(
+				WithCommit(
+					"chore: release v1.0.0",
+					WithFile("VERSION", "v1.0.0"),
+				),
+				WithCommit(
+					"chore: release v1.1.0-staging.0",
+					OnBranch(mainBranchRef),
+					AsNewBranch(remotePRBranchRef),
+				),
+				WithCommit(
+					"chore: release v2.0.0-staging.0",
+					OnBranch(mainBranchRef),
+					AsNewBranch(localPRBranchRef),
+				),
+			),
+			want:    true,
+			wantErr: assert.NoError,
+		},
+		{
+			name: "empty release commit only needs rebase",
+			repo: WithTestRepo(
+				WithCommit(
+					"chore: release v1.0.0",
+					WithFile("VERSION", "v1.0.0"),
+				),
+				WithCommit(
+					"chore: release v1.1.0-staging.0",
+					OnBranch(mainBranchRef),
+					AsNewBranch(remotePRBranchRef),
+				),
+				WithCommit(
+					"feat: new feature on remote",
+					OnBranch(mainBranchRef),
+					WithFile("feature", "yes"),
+				),
+				WithCommit(
+					"chore: release v1.1.0-staging.0",
+					OnBranch(mainBranchRef),
+					AsNewBranch(localPRBranchRef),
+				),
+			),
+			want:    false,
+			wantErr: assert.NoError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -193,4 +240,17 @@ func TestRepository_CommitUsesAuthorAsCommitter(t *testing.T) {
 	assert.Equal(t, author.Email, obj.Author.Email)
 	assert.Equal(t, author.Name, obj.Committer.Name)
 	assert.Equal(t, author.Email, obj.Committer.Email)
+}
+
+func TestRepository_CommitWithoutChanges(t *testing.T) {
+	repo := WithTestRepo()(t)
+	author := Author{Name: "release bot", Email: "release@example.com"}
+
+	commit, err := repo.Commit(context.Background(), "chore: release v1.2.3", author)
+	require.NoError(t, err)
+
+	obj, err := repo.r.CommitObject(plumbing.NewHash(commit.Hash))
+	require.NoError(t, err)
+
+	assert.Equal(t, "chore: release v1.2.3", obj.Message)
 }

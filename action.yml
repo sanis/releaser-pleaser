@@ -18,7 +18,11 @@ inputs:
     required: false
     default: ""
   updaters:
-    description: "List of updaters that are run. Default updaters can be removed by specifying them as -name. Multiple updaters should be concatenated with a comma. Default Updaters: changelog,generic"
+    description: "List of updaters that are run. Default updaters can be removed by specifying them as -name. Multiple updaters should be concatenated with a comma. Default Updaters: changelog,generic (none if prerelease-id is set)"
+    required: false
+    default: ""
+  prerelease-id:
+    description: "Release every version on the branch as a pre-release with this identifier, e.g. staging creates v1.2.0-staging.0. Leave empty for normal releases."
     required: false
     default: ""
   forge:
@@ -48,6 +52,7 @@ runs:
     - --branch=${{ inputs.branch }}
     - --extra-files="${{ inputs.extra-files }}"
     - --updaters="${{ inputs.updaters }}"
+    - --prerelease-id=${{ inputs.prerelease-id }}
     - --api-url=${{ inputs.api-url }}
     - --api-token=${{ inputs.token }}
     - --owner=${{ inputs.owner }}
