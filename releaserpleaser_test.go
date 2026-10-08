@@ -86,3 +86,24 @@ func TestReconcileReleasePR_NoChangesSinceLatestPrerelease(t *testing.T) {
 		assert.Equal(t, []*releasepr.ReleasePullRequest{pr}, f.closed)
 	})
 }
+
+func TestReleaseCommitSubjectRegex(t *testing.T) {
+	tests := []struct {
+		subject string
+		want    bool
+	}{
+		{subject: "chore(main): release v1.2.0", want: true},
+		{subject: "chore(staging): release v1.3.0-staging.0", want: true},
+		{subject: "chore(main): release 1.2.0", want: true},
+		{subject: "chore(main): release 1.3.0-rc.1", want: true},
+		{subject: "chore(deps): release notes tooling", want: false},
+		{subject: "chore: release v1.2.0", want: false},
+		{subject: "feat(main): release v1.2.0", want: false},
+		{subject: "chore(main): release v1.2.0 and more", want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.subject, func(t *testing.T) {
+			assert.Equal(t, tt.want, releaseCommitSubjectRegex.MatchString(tt.subject))
+		})
+	}
+}

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"regexp"
+	"slices"
 
 	"github.com/apricote/releaser-pleaser/internal/changelog"
 	"github.com/apricote/releaser-pleaser/internal/commitparser"
@@ -26,6 +28,11 @@ const (
 var (
 	ErrorPullRequestConflict = errors.New("conflict: pull request description was changed while releaser-pleaser was running")
 )
+
+// releaseCommitSubjectRegex matches the subject of the release commits that releaser-pleaser creates, see
+// [releasepr.TitleFormat]. These are not changes of their own and must not trigger another release, e.g. when the
+// release commit of main is merged into a pre-release branch.
+var releaseCommitSubjectRegex = regexp.MustCompile(`^chore\([^)]+\): release v?\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$`)
 
 type ReleaserPleaser struct {
 	forge        forge.Forge
@@ -406,6 +413,10 @@ func (rp *ReleaserPleaser) analyzedCommitsSince(ctx context.Context, since *git.
 	if err != nil {
 		return nil, err
 	}
+
+	commits = slices.DeleteFunc(commits, func(commit git.Commit) bool {
+		return releaseCommitSubjectRegex.MatchString(commit.Subject())
+	})
 
 	logger.InfoContext(ctx, "Found releasable commits", "length", len(commits))
 
