@@ -1,0 +1,35 @@
+cmd/rp/cmd/run.go
+  s_b4dfe576686702::t_151e284137cc93 111,146,175-178,180-182
+internal/versioning/semver.go
+  s_b4dfe576686702::t_151e284137cc93 39-40,42
+cmd/rp/cmd/run_test.go
+  s_b4dfe576686702::t_11704d232242c6 63-66,98-109,113
+templates/run.yml
+  s_b4dfe576686702::t_8d952555297c79 16
+docs/reference/gitlab-cicd-component.md
+  s_b4dfe576686702::t_8d952555297c79 26
+action.yml
+  s_b4dfe576686702::t_8d952555297c79 21
+docs/guides/pre-release-branches.md
+  s_b4dfe576686702::t_8d952555297c79 71-73
+docs/reference/github-action.md
+  s_b4dfe576686702::t_8d952555297c79 25
+internal/versioning/semver_test.go
+  s_b4dfe576686702::t_11704d232242c6 483-484
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "69b66943c99e846062b57b74bf3be62bcfe91ae7",
+  "prompts": {},
+  "sessions": {
+    "s_b4dfe576686702": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7e2ecb86-67fa-45c3-8480-a8388728ef7c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Justinas Bolys <justinas.bolys@mediatech.one>"
+    }
+  }
+}
