@@ -1,0 +1,21 @@
+releaserpleaser.go
+  s_01cd1638d88c65::t_5af0180d32c39e 8-9,32-36,417-420
+releaserpleaser_test.go
+  s_01cd1638d88c65::t_c7c1792370a423 89-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "67769fac1d1be7b7cbafd679581846089b73ac84",
+  "prompts": {},
+  "sessions": {
+    "s_01cd1638d88c65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6df3d3ba-eb3a-4b7c-aba9-1c1d06b0de7a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Justinas Bolys <justinas.bolys@mediatech.one>"
+    }
+  }
+}
