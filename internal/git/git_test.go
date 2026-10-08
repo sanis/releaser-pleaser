@@ -161,6 +161,53 @@ func TestRepository_HasChangesWithRemote(t *testing.T) {
 			want:    true,
 			wantErr: assert.NoError,
 		},
+		{
+			name: "same files but different release commit message",
+			repo: WithTestRepo(
+				WithCommit(
+					"chore: release v1.0.0",
+					WithFile("VERSION", "v1.0.0"),
+				),
+				WithCommit(
+					"chore: release v1.1.0-staging.0",
+					OnBranch(mainBranchRef),
+					AsNewBranch(remotePRBranchRef),
+				),
+				WithCommit(
+					"chore: release v2.0.0-staging.0",
+					OnBranch(mainBranchRef),
+					AsNewBranch(localPRBranchRef),
+				),
+			),
+			want:    true,
+			wantErr: assert.NoError,
+		},
+		{
+			name: "empty release commit only needs rebase",
+			repo: WithTestRepo(
+				WithCommit(
+					"chore: release v1.0.0",
+					WithFile("VERSION", "v1.0.0"),
+				),
+				WithCommit(
+					"chore: release v1.1.0-staging.0",
+					OnBranch(mainBranchRef),
+					AsNewBranch(remotePRBranchRef),
+				),
+				WithCommit(
+					"feat: new feature on remote",
+					OnBranch(mainBranchRef),
+					WithFile("feature", "yes"),
+				),
+				WithCommit(
+					"chore: release v1.1.0-staging.0",
+					OnBranch(mainBranchRef),
+					AsNewBranch(localPRBranchRef),
+				),
+			),
+			want:    false,
+			wantErr: assert.NoError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

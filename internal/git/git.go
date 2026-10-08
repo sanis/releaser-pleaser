@@ -248,6 +248,12 @@ func (r *Repository) hasChangesWithRemote(ctx context.Context, mainBranchRef, lo
 		return false, err
 	}
 
+	if commitOnRemotePRBranch.Message != commitOnLocalPRBranch.Message {
+		// The release commit message contains the version. It can change without any file changes, e.g. when all
+		// updaters are disabled.
+		return true, nil
+	}
+
 	return remoteDiff.String() != localDiff.String(), nil
 }
 
