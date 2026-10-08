@@ -16,6 +16,14 @@ spec:
       description: "List of updaters that are run. Default updaters can be removed by specifying them as -name. Multiple updaters should be concatenated with a comma. Default Updaters: changelog,generic"
       default: ""
 
+    prerelease-id:
+      description: "Release every version on the branch as a pre-release with this identifier, e.g. staging creates v1.2.0-staging.0. Leave empty for normal releases."
+      default: ""
+
+    job-name:
+      default: releaser-pleaser
+      description: "Name of the created job. Set a different name when you include the component more than once, e.g. for a second branch."
+
     stage:
       default: build
       description: 'Defines the build stage'
@@ -27,7 +35,7 @@ spec:
     # Remember to update docs/reference/gitlab-ci-component.md
 ---
 
-releaser-pleaser:
+$[[ inputs.job-name ]]:
   stage: $[[ inputs.stage ]]
   needs: $[[ inputs.needs ]]
 
@@ -54,4 +62,5 @@ releaser-pleaser:
         --forge=gitlab \
         --branch=$[[ inputs.branch ]] \
         --extra-files="$[[ inputs.extra-files ]]" \
-        --updaters="$[[ inputs.updaters ]]"
+        --updaters="$[[ inputs.updaters ]]" \
+        --prerelease-id="$[[ inputs.prerelease-id ]]"
