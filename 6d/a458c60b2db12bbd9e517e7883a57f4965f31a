@@ -1,0 +1,21 @@
+internal/versioning/semver_test.go
+  s_d937d3c5243e74::t_b692130a3fefe2 468-486
+internal/versioning/semver.go
+  s_d937d3c5243e74::t_76dddba9f33488 60-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6da458c60b2db12bbd9e517e7883a57f4965f31a",
+  "prompts": {},
+  "sessions": {
+    "s_d937d3c5243e74": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bad33d52-2205-4e45-90ff-3a7fcb23bc90",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Justinas Bolys <justinas.bolys@mediatech.one>"
+    }
+  }
+}
