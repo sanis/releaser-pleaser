@@ -1,0 +1,19 @@
+internal/forge/forgejo/forgejo.go
+  s_d937d3c5243e74::t_b17d33c778de9a 433-437
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "869c3f004038ebd6e9bfc0226b841cafac68d994",
+  "prompts": {},
+  "sessions": {
+    "s_d937d3c5243e74": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bad33d52-2205-4e45-90ff-3a7fcb23bc90",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Justinas Bolys <justinas.bolys@mediatech.one>"
+    }
+  }
+}
