@@ -1,0 +1,19 @@
+docs/reference/updaters.md
+  s_b06e0bf3f6cb7b::t_6eda969eb0a3f3 12-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "62a60030c9362db2c0177c339ee819db84dea40a",
+  "prompts": {},
+  "sessions": {
+    "s_b06e0bf3f6cb7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "89d4e6fd-b00b-4cbf-89c7-2490df1ae0d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Justinas Bolys <justinas.bolys@mediatech.one>"
+    }
+  }
+}
