@@ -180,6 +180,8 @@ func (r *Repository) Commit(_ context.Context, message string, author Author) (C
 	releaseCommitHash, err := worktree.Commit(message, &git.CommitOptions{
 		Author:    author.signature(now),
 		Committer: author.signature(now),
+		// The release commit may not change any files, e.g. if all updaters are disabled.
+		AllowEmptyCommits: true,
 	})
 	if err != nil {
 		return Commit{}, fmt.Errorf("failed to commit changes: %w", err)

@@ -194,3 +194,16 @@ func TestRepository_CommitUsesAuthorAsCommitter(t *testing.T) {
 	assert.Equal(t, author.Name, obj.Committer.Name)
 	assert.Equal(t, author.Email, obj.Committer.Email)
 }
+
+func TestRepository_CommitWithoutChanges(t *testing.T) {
+	repo := WithTestRepo()(t)
+	author := Author{Name: "release bot", Email: "release@example.com"}
+
+	commit, err := repo.Commit(context.Background(), "chore: release v1.2.3", author)
+	require.NoError(t, err)
+
+	obj, err := repo.r.CommitObject(plumbing.NewHash(commit.Hash))
+	require.NoError(t, err)
+
+	assert.Equal(t, "chore: release v1.2.3", obj.Message)
+}
