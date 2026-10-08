@@ -25,6 +25,10 @@ inputs:
     description: "Release every version on the branch as a pre-release with this identifier, e.g. staging creates v1.2.0-staging.0. Leave empty for normal releases."
     required: false
     default: ""
+  version-prefix:
+    description: "Whether the released version carries a 'v' prefix. One of auto, v, none. auto reads the prefix from the existing tags and falls back to 'v'."
+    required: false
+    default: ""
   forge:
     description: "Forge this action is run against"
     required: false
@@ -53,6 +57,7 @@ runs:
     - --extra-files="${{ inputs.extra-files }}"
     - --updaters="${{ inputs.updaters }}"
     - --prerelease-id=${{ inputs.prerelease-id }}
+    - --version-prefix=${{ inputs.version-prefix }}
     - --api-url=${{ inputs.api-url }}
     - --api-token=${{ inputs.token }}
     - --owner=${{ inputs.owner }}

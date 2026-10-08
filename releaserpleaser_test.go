@@ -55,7 +55,7 @@ func TestReconcileReleasePR_NoChangesSinceLatestPrerelease(t *testing.T) {
 
 	newRP := func(f *fakeForge) *ReleaserPleaser {
 		logger := slog.New(slog.DiscardHandler)
-		return New(f, logger, "staging", conventionalcommits.NewParser(logger), versioning.SemVerWithPrereleaseID("staging"), nil, nil)
+		return New(f, logger, "staging", conventionalcommits.NewParser(logger), versioning.SemVerWithPrereleaseID("staging", versioning.VersionPrefixAuto), nil, nil)
 	}
 
 	t.Run("no pull request is opened", func(t *testing.T) {

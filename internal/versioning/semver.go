@@ -12,15 +12,20 @@ import (
 	"github.com/apricote/releaser-pleaser/internal/git"
 )
 
-var SemVer Strategy = semVer{}
+// SemVer returns the semver strategy. prefix decides if the emitted versions carry the VPrefix.
+func SemVer(prefix VersionPrefix) Strategy {
+	return semVer{prefix: prefix}
+}
 
 // SemVerWithPrereleaseID returns a [Strategy] that always creates pre-releases with the given identifier,
-// e.g. v1.2.0-staging.0. The next version type from the release pull request is ignored.
-func SemVerWithPrereleaseID(id string) Strategy {
-	return semVer{prereleaseID: id}
+// e.g. v1.2.0-staging.0. The next version type from the release pull request is ignored. prefix decides if the
+// emitted versions carry the VPrefix.
+func SemVerWithPrereleaseID(id string, prefix VersionPrefix) Strategy {
+	return semVer{prefix: prefix, prereleaseID: id}
 }
 
 type semVer struct {
+	prefix       VersionPrefix
 	prereleaseID string
 }
 
@@ -68,7 +73,7 @@ func (s semVer) NextVersion(r git.Releases, versionBump VersionBump, nextVersion
 			return "", err
 		}
 
-		return "v" + next.String(), nil
+		return s.versionPrefix(r) + next.String(), nil
 	}
 
 	switch nextVersionType {
@@ -81,7 +86,7 @@ func (s semVer) NextVersion(r git.Releases, versionBump VersionBump, nextVersion
 		}
 	}
 
-	return "v" + next.String(), nil
+	return s.versionPrefix(r) + next.String(), nil
 }
 
 // setNextPRVersion sets the pre-release of version to prType, counting up from the latest release if it is a
@@ -100,18 +105,47 @@ func setNextPRVersion(version *semver.Version, latest semver.Version, prType str
 	return nil
 }
 
+// versionPrefix returns the prefix to put in front of the version. With VersionPrefixAuto we keep
+// whatever convention the repository already uses, so that a repository tagged "1.2.3" does not
+// switch to "v1.2.4" halfway through its history.
+func (s semVer) versionPrefix(r git.Releases) string {
+	switch s.prefix {
+	case VersionPrefixV:
+		return VPrefix
+	case VersionPrefixNone:
+		return ""
+	case VersionPrefixAuto:
+		// The stable release is the better anchor, we only look at prereleases if the repository
+		// has never had a stable release.
+		for _, tag := range []*git.Tag{r.Stable, r.Latest} {
+			if tag == nil {
+				continue
+			}
+
+			if strings.HasPrefix(tag.Name, VPrefix) {
+				return VPrefix
+			}
+
+			return ""
+		}
+	}
+
+	// No tag to read the convention from. Keep the "v" that releaser-pleaser has always emitted.
+	return VPrefix
+}
+
+// BumpFromCommits returns the version bump required for the commits. Every commit is releasable,
+// types without a dedicated meaning (chore, docs, other, ...) result in a patch release.
 func BumpFromCommits(commits []commitparser.AnalyzedCommit) VersionBump {
 	bump := UnknownVersion
 
 	for _, commit := range commits {
-		entryBump := UnknownVersion
+		entryBump := PatchVersion
 		switch {
 		case commit.BreakingChange:
 			entryBump = MajorVersion
-		case commit.Type == "feat":
+		case commit.Type == commitparser.TypeFeature:
 			entryBump = MinorVersion
-		case commit.Type == "fix":
-			entryBump = PatchVersion
 		}
 
 		if entryBump > bump {

@@ -163,10 +163,16 @@ func (g *GitHub) CommitsSince(ctx context.Context, tag *git.Tag) ([]git.Commit, 
 
 	var commits = make([]git.Commit, 0, len(repositoryCommits))
 	for _, ghCommit := range repositoryCommits {
+		parents := make([]string, 0, len(ghCommit.Parents))
+		for _, parent := range ghCommit.Parents {
+			parents = append(parents, parent.GetSHA())
+		}
+
 		commit := git.Commit{
 			Hash:    ghCommit.GetSHA(),
 			URL:     g.CommitURL(ghCommit.GetSHA()),
 			Message: ghCommit.GetCommit().GetMessage(),
+			Parents: parents,
 		}
 		commit.PullRequest, err = g.prForCommit(ctx, commit)
 		if err != nil {

@@ -17,6 +17,7 @@ func TestSemVer_NextVersion(t *testing.T) {
 		releases        git.Releases
 		versionBump     VersionBump
 		nextVersionType NextVersionType
+		prefix          VersionPrefix
 	}
 	tests := []struct {
 		name    string
@@ -312,6 +313,132 @@ func TestSemVer_NextVersion(t *testing.T) {
 			wantErr: assert.Error,
 		},
 		{
+			name: "infers v prefix from stable tag",
+			args: args{
+				releases: git.Releases{
+					Latest: &git.Tag{Name: "v1.1.1"},
+					Stable: &git.Tag{Name: "v1.1.1"},
+				},
+				versionBump:     PatchVersion,
+				nextVersionType: NextVersionTypeUndefined,
+				prefix:          VersionPrefixAuto,
+			},
+			want:    "v1.1.2",
+			wantErr: assert.NoError,
+		},
+		{
+			name: "infers bare prefix from stable tag",
+			args: args{
+				releases: git.Releases{
+					Latest: &git.Tag{Name: "1.395.0"},
+					Stable: &git.Tag{Name: "1.395.0"},
+				},
+				versionBump:     PatchVersion,
+				nextVersionType: NextVersionTypeUndefined,
+				prefix:          VersionPrefixAuto,
+			},
+			want:    "1.395.1",
+			wantErr: assert.NoError,
+		},
+		{
+			name: "infers bare prefix for a prerelease",
+			args: args{
+				releases: git.Releases{
+					Latest: &git.Tag{Name: "1.395.0"},
+					Stable: &git.Tag{Name: "1.395.0"},
+				},
+				versionBump:     MinorVersion,
+				nextVersionType: NextVersionTypeRC,
+				prefix:          VersionPrefixAuto,
+			},
+			want:    "1.396.0-rc.0",
+			wantErr: assert.NoError,
+		},
+		{
+			name: "infers bare prefix from latest tag when there is no stable release",
+			args: args{
+				releases: git.Releases{
+					Latest: &git.Tag{Name: "1.1.1-rc.0"},
+					Stable: nil,
+				},
+				versionBump:     PatchVersion,
+				nextVersionType: NextVersionTypeUndefined,
+				prefix:          VersionPrefixAuto,
+			},
+			want:    "1.1.2",
+			wantErr: assert.NoError,
+		},
+		{
+			name: "stable tag wins over latest tag for inference",
+			args: args{
+				releases: git.Releases{
+					Latest: &git.Tag{Name: "v1.1.2-rc.0"},
+					Stable: &git.Tag{Name: "1.1.1"},
+				},
+				versionBump:     PatchVersion,
+				nextVersionType: NextVersionTypeUndefined,
+				prefix:          VersionPrefixAuto,
+			},
+			want:    "1.1.2",
+			wantErr: assert.NoError,
+		},
+		{
+			name: "keeps v prefix when there is no prior tag",
+			args: args{
+				releases: git.Releases{
+					Latest: nil,
+					Stable: nil,
+				},
+				versionBump:     MinorVersion,
+				nextVersionType: NextVersionTypeUndefined,
+				prefix:          VersionPrefixAuto,
+			},
+			want:    "v0.1.0",
+			wantErr: assert.NoError,
+		},
+		{
+			name: "explicit none prefix on a first release",
+			args: args{
+				releases: git.Releases{
+					Latest: nil,
+					Stable: nil,
+				},
+				versionBump:     MinorVersion,
+				nextVersionType: NextVersionTypeUndefined,
+				prefix:          VersionPrefixNone,
+			},
+			want:    "0.1.0",
+			wantErr: assert.NoError,
+		},
+		{
+			name: "explicit none prefix overrides the tags",
+			args: args{
+				releases: git.Releases{
+					Latest: &git.Tag{Name: "v1.1.1"},
+					Stable: &git.Tag{Name: "v1.1.1"},
+				},
+				versionBump:     PatchVersion,
+				nextVersionType: NextVersionTypeUndefined,
+				prefix:          VersionPrefixNone,
+			},
+			want:    "1.1.2",
+			wantErr: assert.NoError,
+		},
+		{
+			name: "explicit v prefix overrides the tags",
+			args: args{
+				releases: git.Releases{
+					Latest: &git.Tag{Name: "1.1.1"},
+					Stable: &git.Tag{Name: "1.1.1"},
+				},
+				versionBump:     PatchVersion,
+				nextVersionType: NextVersionTypeUndefined,
+				prefix:          VersionPrefixV,
+			},
+			want:    "v1.1.2",
+			wantErr: assert.NoError,
+		},
+		{
 			name: "error on invalid bump",
 			args: args{
 				releases: git.Releases{
@@ -328,7 +455,7 @@ func TestSemVer_NextVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SemVer.NextVersion(tt.args.releases, tt.args.versionBump, tt.args.nextVersionType)
+			got, err := SemVer(tt.args.prefix).NextVersion(tt.args.releases, tt.args.versionBump, tt.args.nextVersionType)
 			if !tt.wantErr(t, err, fmt.Sprintf("SemVerNextVersion(Releases(%v, %v), %v, %v)", tt.args.releases.Latest, tt.args.releases.Stable, tt.args.versionBump, tt.args.nextVersionType)) {
 				return
 			}
@@ -349,9 +476,24 @@ func TestVersionBumpFromCommits(t *testing.T) {
 			want:            UnknownVersion,
 		},
 		{
-			name:            "non-release type (unknown)",
+			name:            "neutral conventional type (patch)",
 			analyzedCommits: []commitparser.AnalyzedCommit{{Type: "docs"}},
-			want:            UnknownVersion,
+			want:            PatchVersion,
+		},
+		{
+			name:            "chore only (patch)",
+			analyzedCommits: []commitparser.AnalyzedCommit{{Type: "chore"}, {Type: "ci"}},
+			want:            PatchVersion,
+		},
+		{
+			name:            "other only (patch)",
+			analyzedCommits: []commitparser.AnalyzedCommit{{Type: commitparser.TypeOther}},
+			want:            PatchVersion,
+		},
+		{
+			name:            "breaking other (major)",
+			analyzedCommits: []commitparser.AnalyzedCommit{{Type: commitparser.TypeOther, BreakingChange: true}},
+			want:            MajorVersion,
 		},
 		{
 			name:            "single breaking (major)",
@@ -420,7 +562,7 @@ func TestSemVer_IsPrerelease(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, SemVer.IsPrerelease(tt.version), "IsSemverPrerelease(%v)", tt.version)
+			assert.Equalf(t, tt.want, SemVer(VersionPrefixAuto).IsPrerelease(tt.version), "IsSemverPrerelease(%v)", tt.version)
 		})
 	}
 }
@@ -428,6 +570,7 @@ func TestSemVer_IsPrerelease(t *testing.T) {
 func TestSemVerWithPrereleaseID_NextVersion(t *testing.T) {
 	tests := []struct {
 		name            string
+		prefix          VersionPrefix
 		releases        git.Releases
 		versionBump     VersionBump
 		nextVersionType NextVersionType
@@ -491,10 +634,43 @@ func TestSemVerWithPrereleaseID_NextVersion(t *testing.T) {
 			want:        "v0.0.1-staging.0",
 			wantErr:     assert.NoError,
 		},
+		{
+			name:   "auto prefix keeps a repository without v prefix",
+			prefix: VersionPrefixAuto,
+			releases: git.Releases{
+				Latest: &git.Tag{Name: "1.2.0-staging.0"},
+				Stable: &git.Tag{Name: "1.1.0"},
+			},
+			versionBump: MinorVersion,
+			want:        "1.2.0-staging.1",
+			wantErr:     assert.NoError,
+		},
+		{
+			name:   "no prefix",
+			prefix: VersionPrefixNone,
+			releases: git.Releases{
+				Latest: &git.Tag{Name: "v1.1.0"},
+				Stable: &git.Tag{Name: "v1.1.0"},
+			},
+			versionBump: MinorVersion,
+			want:        "1.2.0-staging.0",
+			wantErr:     assert.NoError,
+		},
+		{
+			name:   "v prefix",
+			prefix: VersionPrefixV,
+			releases: git.Releases{
+				Latest: &git.Tag{Name: "1.2.0-staging.0"},
+				Stable: &git.Tag{Name: "1.1.0"},
+			},
+			versionBump: MinorVersion,
+			want:        "v1.2.0-staging.1",
+			wantErr:     assert.NoError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SemVerWithPrereleaseID("staging").NextVersion(tt.releases, tt.versionBump, tt.nextVersionType)
+			got, err := SemVerWithPrereleaseID("staging", tt.prefix).NextVersion(tt.releases, tt.versionBump, tt.nextVersionType)
 			if !tt.wantErr(t, err) {
 				return
 			}
